@@ -45,14 +45,26 @@ public class SimpleCracker {
 
     var results = new ArrayList<String>(passwords.size());
     for (var item : passwords) {
+      boolean noMatch = true;
       for (var word : dict) {
         var targetHash = theHash(item.salt + word);
-        if (targetHash == item.hashValue) {
+
+        if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
+          noMatch = false;
           break; // jump to next password
         }
       }
-      System.out.println("did not get password for user: " + item.user);
+      if (noMatch)
+        System.out.println("did not get password for user: " + item.user);
+    }
+
+    emitMatches(results);
+  }
+
+  void emitMatches(ArrayList<String> matches) {
+    for(var match:matches) {
+      System.out.println(match);
     }
   }
 
@@ -62,11 +74,15 @@ public class SimpleCracker {
     if (null == md)
       md = MessageDigest.getInstance("MD5");
       
-    md.update(message.getBytes());
-    byte[] digest = md.digest();
+    byte[] digest = md.digest(message.trim().getBytes());
     var rv = toHex(digest);
 
     return rv;
+  }
+
+  private static String toHex(byte[] bytes) {
+    BigInteger bi = new BigInteger(1, bytes);
+    return String.format("%0" + (bytes.length << 1) + "X", bi);
   }
 
   private ArrayList<String> getDictionairy() {
@@ -108,10 +124,7 @@ public class SimpleCracker {
   //   throw new NotImplementedException(message);
   // }
 
-  private static String toHex(byte[] bytes) {
-    BigInteger bi = new BigInteger(1, bytes);
-    return String.format("%0" + (bytes.length << 1) + "X", bi);
-  }
+
 
   class LineFormat {
     public String user;

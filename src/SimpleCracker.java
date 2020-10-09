@@ -80,12 +80,12 @@ public class SimpleCracker {
     return rv;
   }
 
-  private static String toHex(byte[] bytes) {
+  static String toHex(byte[] bytes) {
     BigInteger bi = new BigInteger(1, bytes);
     return String.format("%0" + (bytes.length << 1) + "X", bi);
   }
 
-  private ArrayList<String> getDictionairy() {
+  ArrayList<String> getDictionairy() {
     var words = new ArrayList<String>();
     try {
       Scanner scanner = new Scanner(new File(s_dictionairy_file));
@@ -102,7 +102,7 @@ public class SimpleCracker {
     return words;
   }
 
-  private ArrayList<LineFormat> getPasswordLines() {
+  ArrayList<LineFormat> getPasswordLines() {
     var passwords = new ArrayList<LineFormat>();
     try {
       Scanner scanner = new Scanner(new File(s_password_file));
@@ -118,12 +118,6 @@ public class SimpleCracker {
     }
     return passwords;
   }
-
-  // helpers
-  // public static String toHex(String message) throws NotImplementedException {
-  //   throw new NotImplementedException(message);
-  // }
-
 
 
   class LineFormat {

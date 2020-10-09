@@ -8,12 +8,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
- * SimpleCracker: will read two files and emit user names and passwords
+ * Cracker: will read two files and emit user names and passwords
  * program assumes that two files exist in program directory:
  * 
  * 1. common-passwords.txt -- this is the dictionairy that is used to brute
- * force attempt to find the passwords for each users 2. shadow - file
- * containing 'user:sale:hash(salt+password)'
+ * force attempt to find the passwords for each users 
+ * 2. shadow - file containing 'user:sale:hash(salt+password)'
  * 
  * Shawn Cicoria - CS 645 - Project 1: Problem 1
  * sc2443@njit.edu / shawn@cicoria.com
@@ -21,17 +21,17 @@ import java.util.Scanner;
  * Octorber 12, 2020
  */
 
-public class SimpleCracker {
+public class Cracker {
 
-  static String s_password_file = "./shadow-simple";
+  static String s_password_file = "./shadow";
   static String s_dictionairy_file = "./common-passwords.txt";
   static MessageDigest messageHash = null;
 
   public static void main(String[] args) throws Exception {
 
-    var sc = new SimpleCracker();
+    var cr = new Cracker();
 
-    sc.run();
+    cr.run();
 
     System.out.println("done....");
   }
@@ -52,7 +52,7 @@ public class SimpleCracker {
     for (var item : passwords) {
       boolean noMatch = true;
       for (var word : dict) {
-        var targetHash = theHash(item.salt + word);
+        var targetHash = theHash(word, item.salt);
 
         if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
@@ -61,7 +61,7 @@ public class SimpleCracker {
         }
       }
       if (noMatch)
-        System.out.println("did not get password for user: " + item.user);
+        System.err.println("did not get password for user: " + item.user);
     }
 
     emitMatches(results);
@@ -73,15 +73,9 @@ public class SimpleCracker {
     }
   }
 
+  static String theHash(String password, String salt) throws NoSuchAlgorithmException {
 
-
-  static String theHash(String message) throws NoSuchAlgorithmException {
-    if (null == messageHash)
-      messageHash = MessageDigest.getInstance("MD5");
-      
-    byte[] digest = messageHash.digest(message.trim().getBytes());
-    var rv = toHex(digest);
-
+    String rv = MD5Shadow.crypt(password, salt);
     return rv;
   }
 
@@ -113,8 +107,10 @@ public class SimpleCracker {
       Scanner scanner = new Scanner(new File(s_password_file));
       while (scanner.hasNextLine()) {
         String[] parts = scanner.nextLine().split(":");
-        if (parts.length == 3) {
-          passwords.add(new LineFormat(parts[0], parts[1], parts[2]));
+        String[] pass_parts = parts[1].split("\\$");;
+
+        if (pass_parts.length == 4) {
+          passwords.add(new LineFormat(parts[0], pass_parts[2], pass_parts[3]));
         }
       }
     } catch (FileNotFoundException e) {

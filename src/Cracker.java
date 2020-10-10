@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,15 +14,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Cracker: will read two files and emit user names and passwords
- * program assumes that two files exist in program directory:
+ * Cracker: will read two files and emit user names and passwords program
+ * assumes that two files exist in program directory:
  * 
  * 1. common-passwords.txt -- this is the dictionairy that is used to brute
- * force attempt to find the passwords for each users 
- * 2. shadow - file containing 'user:sale:hash(salt+password)'
+ * force attempt to find the passwords for each users 2. shadow - file
+ * containing 'user:sale:hash(salt+password)'
  * 
- * Shawn Cicoria - CS 645 - Project 1: Problem 1
- * sc2443@njit.edu / shawn@cicoria.com
+ * Shawn Cicoria - CS 645 - Project 1: Problem 1 sc2443@njit.edu /
+ * shawn@cicoria.com
  * 
  * Octorber 12, 2020
  */
@@ -51,7 +52,7 @@ public class Cracker {
     System.out.println("done with dict file: " + s_dictionairy_file);
   }
 
-  public void run() throws NoSuchAlgorithmException {
+  public void run() throws NoSuchAlgorithmException, IOException {
     System.err.println("loading dict");
     var dict = getDictionairy();
 
@@ -79,10 +80,16 @@ public class Cracker {
       for (var word : dict) {
         var targetHash = theHash(word, item.salt);
 
+        if (Files.exists(doneFile)) {
+          System.err.println("done file for user exists: " + item.user + " done file: " + doneFile);
+          break;
+        }
+
         if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
           System.out.println("\tSUCCESS: " + item.user + ":" + word);
           File doneFile_output = new File(item.user + ".done");
+          doneFile_output.createNewFile();
           System.err.println("wrote done file: " + doneFile_output.getName());
           noMatch = false;
           break; // jump to next password

@@ -1,1 +1,3 @@
+LC_ALL=C sed 's/[^a-zA-Z]//g' crackstation.txt > common-passwords_step1.txt
+awk 'NF' common-passwords_step1.txt > common-passwords.txt
 split -l$((`wc -l < common-passwords.txt`/48)) common-passwords.txt onepiece.split.log -da 4

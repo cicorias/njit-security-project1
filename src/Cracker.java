@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidParameterException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -32,22 +35,31 @@ public class Cracker {
   static String exp = "^(?=.*[a-z])[a-z]+$";
   static Pattern p = Pattern.compile(exp);
 
+  static Path doneFile = null;
+
   public static void main(String[] args) throws Exception {
+
+    if (args.length > 0) {
+      s_dictionairy_file = args[0];
+      System.out.println("using file for dict: " + args[0]);
+    }
 
     var cr = new Cracker();
 
     cr.run();
 
-    System.out.println("done....");
+    System.out.println("done with dict file: " + s_dictionairy_file);
   }
 
   public void run() throws NoSuchAlgorithmException {
+    System.err.println("loading dict");
     var dict = getDictionairy();
 
     if (dict.size() == 0) {
       throw new InvalidParameterException("dictionairy file has no lines");
     }
 
+    System.err.println("loading password file");
     var passwords = getPasswordLines();
     if (passwords.size() == 0) {
       throw new InvalidParameterException("password file has no lines");
@@ -55,13 +67,23 @@ public class Cracker {
 
     var results = new ArrayList<String>(passwords.size());
     for (var item : passwords) {
+      System.err.println("checking user " + item.user);
+
+      doneFile = Paths.get(item.user + ".done");
+      if (Files.exists(doneFile)) {
+        System.err.println("done file for user exists: " + item.user + " done file: " + doneFile);
+        continue;
+      }
+    
       boolean noMatch = true;
       for (var word : dict) {
         var targetHash = theHash(word, item.salt);
 
         if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
-          System.out.println(item.user + ":" + word);
+          System.out.println("\tSUCCESS: " + item.user + ":" + word);
+          File doneFile_output = new File(item.user + ".done");
+          System.err.println("wrote done file: " + doneFile_output.getName());
           noMatch = false;
           break; // jump to next password
         }
@@ -175,6 +197,4 @@ public class Cracker {
       this.hashValue = hashValue;
     }
   }
-
-
 }

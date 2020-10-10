@@ -1,0 +1,1 @@
+split -l$((`wc -l < common-passwords.txt`/48)) common-passwords.txt onepiece.split.log -da 4

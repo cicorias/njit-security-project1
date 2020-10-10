@@ -6,6 +6,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Cracker: will read two files and emit user names and passwords
@@ -26,6 +28,9 @@ public class Cracker {
   static String s_password_file = "./shadow";
   static String s_dictionairy_file = "./common-passwords.txt";
   static MessageDigest messageHash = null;
+
+  static String exp = "^(?=.*[a-z])[a-z]+$";
+  static Pattern p = Pattern.compile(exp);
 
   public static void main(String[] args) throws Exception {
 
@@ -56,6 +61,7 @@ public class Cracker {
 
         if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
+          System.out.println(item.user + ":" + word);
           noMatch = false;
           break; // jump to next password
         }
@@ -69,13 +75,19 @@ public class Cracker {
 
   void emitMatches(ArrayList<String> matches) {
     for(var match:matches) {
-      System.out.println(match);
+      ; //System.out.println(match);
     }
   }
 
   static String theHash(String password, String salt) throws NoSuchAlgorithmException {
 
-    String rv = MD5Shadow.crypt(password, salt);
+    String rv = null;
+    try {
+      rv = MD5Shadow.crypt(password, salt);
+    } catch (ArrayIndexOutOfBoundsException e) {
+      System.err.println("Failed to decrypt a user - but in MD5Shadow code. password: " + password + "   Salt: " + salt);
+      rv = "failed-to-decrypt";
+    }
     return rv;
   }
 
@@ -90,7 +102,7 @@ public class Cracker {
       Scanner scanner = new Scanner(new File(s_dictionairy_file));
       while (scanner.hasNextLine()) {
         var word = scanner.nextLine().trim();
-        if (word.length() > 0) {
+        if ( isAlphaNumeric(word) && word.length() < 16) {
           words.add(word);
         }
       }
@@ -119,6 +131,37 @@ public class Cracker {
     }
     return passwords;
   }
+
+  ArrayList<String> getPasswordLinesString() {
+    var passwords = new ArrayList<String>();
+    try {
+      Scanner scanner = new Scanner(new File(s_password_file));
+      while (scanner.hasNextLine()) {
+        passwords.add(scanner.nextLine());
+      }
+    } catch (FileNotFoundException e) {
+      System.out.println("password file: " + s_password_file + " was not found");
+      e.printStackTrace();
+    }
+    return passwords;
+  }
+
+  static boolean isAlphaNumeric(String str) 
+  { 
+      // return false 
+      if (str == null) { 
+          return false; 
+      } 
+
+      // Pattern class contains matcher() method 
+      // to find matching between given string 
+      // and regular expression. 
+      Matcher m = p.matcher(str); 
+
+      // Return if the string 
+      // matched the ReGex 
+      return m.matches(); 
+  } 
 
 
   class LineFormat {

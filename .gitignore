@@ -25,3 +25,8 @@ hs_err_pid*
 
 .DS_Store
 .vscode/
+
+
+src2/
+err.txt
+cain.txt

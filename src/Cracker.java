@@ -208,7 +208,7 @@ public class Cracker {
     if (remain > total) {
       throw new IllegalArgumentException();
     }
-    int maxBarSize = 100; // 10unit for 100%
+    int maxBarSize = 10; // 10unit for 100%
     int remainPercent = ((100 * remain) / total) / maxBarSize;
     char defaultChar = '-';
     String icon = "*";

@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -88,6 +89,11 @@ public class Cracker {
         if (targetHash.compareTo(item.hashValue) == 0) {
           results.add(item.user + ":" + word);
           System.out.println("\tSUCCESS: " + item.user + ":" + word);
+
+          FileWriter myWriter = new FileWriter(item.user + ".done");
+          myWriter.write(item.user + ":" + word);
+          myWriter.close();
+
           File doneFile_output = new File(item.user + ".done");
           doneFile_output.createNewFile();
           System.err.println("wrote done file: " + doneFile_output.getName());
@@ -104,7 +110,7 @@ public class Cracker {
 
   void emitMatches(ArrayList<String> matches) {
     for(var match:matches) {
-      ; //System.out.println(match);
+      System.out.println(match);
     }
   }
 

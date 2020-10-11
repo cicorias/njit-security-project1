@@ -76,9 +76,14 @@ public class Cracker {
         System.err.println("done file for user exists: " + item.user + " done file: " + doneFile);
         continue;
       }
-    
+
+      int wordsDone = 0;
       boolean noMatch = true;
       for (var word : dict) {
+        wordsDone++;
+
+        progressPercentage(dict.size() - wordsDone, dict.size());
+
         var targetHash = theHash(word, item.salt);
 
         if (Files.exists(doneFile)) {
@@ -109,7 +114,7 @@ public class Cracker {
   }
 
   void emitMatches(ArrayList<String> matches) {
-    for(var match:matches) {
+    for (var match : matches) {
       System.out.println(match);
     }
   }
@@ -120,7 +125,8 @@ public class Cracker {
     try {
       rv = MD5Shadow.crypt(password, salt);
     } catch (ArrayIndexOutOfBoundsException e) {
-      System.err.println("Failed to decrypt a user - but in MD5Shadow code. password: " + password + "   Salt: " + salt);
+      System.err
+          .println("Failed to decrypt a user - but in MD5Shadow code. password: " + password + "   Salt: " + salt);
       rv = "failed-to-decrypt";
     }
     return rv;
@@ -137,7 +143,7 @@ public class Cracker {
       Scanner scanner = new Scanner(new File(s_dictionairy_file));
       while (scanner.hasNextLine()) {
         var word = scanner.nextLine().trim();
-        if ( isAlphaNumeric(word) && word.length() < 16) {
+        if (isAlphaNumeric(word) && word.length() < 16) {
           words.add(word);
         }
       }
@@ -154,7 +160,8 @@ public class Cracker {
       Scanner scanner = new Scanner(new File(s_password_file));
       while (scanner.hasNextLine()) {
         String[] parts = scanner.nextLine().split(":");
-        String[] pass_parts = parts[1].split("\\$");;
+        String[] pass_parts = parts[1].split("\\$");
+        ;
 
         if (pass_parts.length == 4) {
           passwords.add(new LineFormat(parts[0], pass_parts[2], pass_parts[3]));
@@ -181,23 +188,42 @@ public class Cracker {
     return passwords;
   }
 
-  static boolean isAlphaNumeric(String str) 
-  { 
-      // return false 
-      if (str == null) { 
-          return false; 
-      } 
+  static boolean isAlphaNumeric(String str) {
+    // return false
+    if (str == null) {
+      return false;
+    }
 
-      // Pattern class contains matcher() method 
-      // to find matching between given string 
-      // and regular expression. 
-      Matcher m = p.matcher(str); 
+    // Pattern class contains matcher() method
+    // to find matching between given string
+    // and regular expression.
+    Matcher m = p.matcher(str);
 
-      // Return if the string 
-      // matched the ReGex 
-      return m.matches(); 
-  } 
+    // Return if the string
+    // matched the ReGex
+    return m.matches();
+  }
 
+  static void progressPercentage(int remain, int total) {
+    if (remain > total) {
+      throw new IllegalArgumentException();
+    }
+    int maxBarSize = 100; // 10unit for 100%
+    int remainPercent = ((100 * remain) / total) / maxBarSize;
+    char defaultChar = '-';
+    String icon = "*";
+    String bar = new String(new char[maxBarSize]).replace('\0', defaultChar) + "]";
+    StringBuilder barDone = new StringBuilder();
+    barDone.append("[");
+    for (int i = 0; i < remainPercent; i++) {
+      barDone.append(icon);
+    }
+    String barRemain = bar.substring(remainPercent, bar.length());
+    System.out.print("\r" + barDone + barRemain + " " + remainPercent * 10 + "%");
+    if (remain == total) {
+      System.out.print("\n");
+    }
+  }
 
   class LineFormat {
     public String user;

@@ -217,7 +217,9 @@ public class Cracker {
     String bar = "";
     try {
       int maxBarSize = 10; // 10unit for 100%
-      remainPercent = ((100 * remain) / total) / maxBarSize;
+      remainPercent = (int)((100.0f * remain) / total);
+      remainPercent /= maxBarSize;
+      if (remainPercent < 0) remainPercent = 100;
       char defaultChar = '-';
       String icon = "*";
       bar = new String(new char[maxBarSize]).replace('\0', defaultChar) + "]";
@@ -236,7 +238,6 @@ public class Cracker {
       System.err.print("failure pct report. with remain / total: " + remain + " and " + total );
       System.err.print("failure pct report. with remainPercent / total: " + remainPercent + " and " + bar.length() );
     }
-
 
   }
 

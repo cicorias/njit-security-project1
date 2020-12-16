@@ -6,6 +6,13 @@
   "configurations": [
     {
       "type": "java",
+      "name": "CodeLens (Launch) - Cracker",
+      "request": "launch",
+      "mainClass": "Cracker",
+      "projectName": "njit-security-project1_3ccb00e1"
+    },
+    {
+      "type": "java",
       "name": "Debug (Launch) - Current File",
       "request": "launch",
       "mainClass": "${file}",

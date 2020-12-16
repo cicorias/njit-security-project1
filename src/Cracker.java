@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class Cracker {
 
-  static String s_password_file = "./shadow";
+  static String s_password_file = "./shadow-test";
   static String s_dictionairy_file = "./common-passwords.txt";
   static MessageDigest messageHash = null;
 

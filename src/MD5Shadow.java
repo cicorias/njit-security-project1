@@ -108,17 +108,17 @@ public class MD5Shadow
 
         /////////I am commenting out this one.... But for longer passwords, it should have to be enabled....
         
-//        for (ind = password.length(); ind > 0; ind -= 16)
-//        {
-//            if (ind > 16)
-//            {
-//                ctx = Concat(ctx, ctx2);
-//            }
-//            else
-//            {
-//                ctx = PartialConcat(ctx, ctx2, ind);
-//            }
-//        }
+       for (int ind = password.length(); ind > 0; ind -= 16)
+       {
+           if (ind > 16)
+           {
+               ctx = Concat(ctx, ctx2);
+           }
+           else
+           {
+               ctx = PartialConcat(ctx, ctx2, ind);
+           }
+       }
 
         ctx = PartialConcat(ctx, ctx2, password.length());
 
